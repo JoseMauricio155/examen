@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<!-- Hola -->
+<body>
+<div class="container" style="padding-bottom: 16px">
+<header th:replace="layout/layout :: header"></header>
+</div>
+<div class="container">
+
+<form action="" name="noo" id="noo" class="">
+
+<div class="row">
+<div class="col-6">
+<input type="number" step="1"  id="numero" size="20" class="form-control" placeholder="Ingresa el folio de la factura"/>
+</div>
+<div class="col-6">
+<button name="num" id="num" class="btn btn-primary">Buscar</button>
+</div>
+</div>
+	
+	
+
+	
+	
+	
+	</form>
+<h4 style="padding-top: 16px;">Listado de productos</h4>
+<table th:replace="layout/plantilla :: itemsventa"  class="table table-striped"></table>
+<table id="cargarVenta" class="table table-striped">
+<thead>
+						<tr>
+							<th>Num</th>
+							<th>Producto</th>
+							<th>Cantidad</th>
+							<th>Precio unitario</th>
+							<th >Total</th>
+							
+						</tr>
+					</thead>
+					<tbody>
+				
+					</tbody>
+</table>
+<div class="row">
+<div class="col-6">
+<div class="row">
+<div class="col"><h3>Total: </h3></div>
+<div class="col"> <h5 id="mostrartotal"></h5> </div>
+</div>
+
+
+</div>
+<div class="col-6">
+<div class="row">
+<div class="col-5">
+<h4>Total productos: </h4>
+</div>
+<div class="col-2">
+ <h5 id="mostrartotalprod" style="text-align: center;"></h5>
+</div>
+</div>
+ 
+</div>
+</div>
+
+
+<input type="hidden" id="urlAjax" th:value="@{'/venta/'}">
+
+</div>
+
+
+<footer th:replace="layout/layout :: footer"></footer>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		
+		//$("#cargarVenta").empty();
+		
+		//hola
+		
+		$("#noo").submit(function(event,request, response) {
+         
+			
+			
+			
+			
+			//stop submit the form, we will post it manually.
+			event.preventDefault();
+			
+			var urlAjax=$("#urlAjax").val();
+			
+			var elmtTable = document.getElementById('cargarVenta');
+			var tableRows = elmtTable.getElementsByTagName('tr');
+			var rowCount = tableRows.length;
+			 $("#mostrartotal").html("0");
+			 $("#mostrartotalprod").html("0");
+			for (var x=rowCount-1; x>0; x--) {
+			   elmtTable.removeChild(tableRows[x]);
+			}
+
+			
+					$.ajax({
+						url : urlAjax + $("#numero").val(),
+						dataType : "json",
+						data : {
+						
+						},
+						success : function(data) {
+						//	console.log(data);
+							($.map(data, function(item) {
+							//	var dat=data.items;
+							//var dat=data.items;
+						//	var ot=dat.producto.precio
+							//console.log(data);
+						
+								
+							//console.log(item.producto.precio);
+								return {
+									value : item.id,
+								
+								
+								};
+							
+							}));
+							
+					//		alert("hola");
+					let dat;
+					var cantidadp=0;
+								for(let i = 0; i < data.items.length; i++) {
+									 var linea=$("#plantillaItemsventa").html();//obtiene el contenido html de este elemnto
+										
+								 
+							 // console.log(data.items[i].cantidad);  // (o el campo que necesites)
+							   dat=data.items[i].producto;
+							  cantidadp=cantidadp+data.items[i].cantidad;
+							 //   console.log(dat);
+					            linea=linea.replace(/{NUM}/g,i+1);
+							    linea=linea.replace(/{NOMBRE}/g,data.items[i].producto.nombre);
+							    linea=linea.replace(/{PRECIO}/g,data.items[i].producto.precio);
+							    linea=linea.replace(/{CANTIDAD}/g,data.items[i].cantidad);
+							    linea=linea.replace(/{TOTAL}/g,data.items[i].importe);
+							    
+							    console.log(cantidadp);
+						
+							    $("#cargarVenta").append(linea);
+							}
+								 $("#mostrartotal").html(data.total);
+								 $("#mostrartotalprod").html(cantidadp);
+								 
+								
+							 console.log(dat);
+						},
+					});
+				
+			
+			
+
+		});
+
+	});
+	
+	
+</script>
+</body>
+
+
+</html>
